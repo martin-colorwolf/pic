@@ -1,0 +1,83 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0" metadata-complete="false">
+
+
+    <!-- 项目名称 -->
+    <display-name>Archetype Created Web Application</display-name>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:spring-config.xml
+        </param-value>
+    </context-param>
+
+
+    <!--
+    当content-type是"application/x-www-form-urlencoded;
+    charset=utf-8"时，spring会自动设置request.setCharacterEncoding("UTF-8")，我用ajax方式提交的数据都是这样的content-type，没有乱码。
+    但是form标签不能指定charset，spring默认设置的是Latin-1，所以会有乱码。
+    虽然我在拦截器中已经setCharacterEncoding("UTF-8")，但是spring已经在这之前把浏览器发过的utf-8编码转成了Latin-1。
+    -->
+    <filter>
+        <filter-name>Spring character encoding filter</filter-name>
+        <filter-class>
+            org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>Spring character encoding filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 配置HiddenHttpMethodFilter：可以把 POST 请求转为 DELETE 或 PUT 请求 -->
+    <filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 默认页面设置 -->
+    <welcome-file-list>
+        <welcome-file>/log.jsp</welcome-file>
+    </welcome-file-list>
+    <!-- 配置spring-servlet  开始  -->
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 配置spring-servlet的一个初始化参数：配置spring-mvc配置文件的位置和参数-->
+
+        <!--
+              实际上也可以不通过contextConfigLocation来配置springmvc的配置文件
+              默认的配置文件为:/WEB-INF/<servlet-name>-servlet.xml
+         -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-servlet.xml</param-value>
+        </init-param>
+
+
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <!--  所有请求  -->
+        <url-pattern>/</url-pattern>
+
+    </servlet-mapping>
+
+
+</web-app>
